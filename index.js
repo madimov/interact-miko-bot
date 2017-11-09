@@ -179,6 +179,12 @@ function emailData() {
 	});
 }
 
+function clearInfo() {
+	for (let key in personInfo) {
+		personInfo[key] = "";
+	}
+}
+
 // set up text to be send
 function sendText(sender, text) {
 	let messageData = {text: text};
