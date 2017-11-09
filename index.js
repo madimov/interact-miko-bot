@@ -98,6 +98,12 @@ function getNextEmptyKey() {
 	}
 }
 
+function fillNextEmptyKey(sender, text) {
+	let key = getNextEmptyKey();
+	console.log("getting next empty key: ", key);
+	getValue(sender, text, key);
+}
+
 // set up text to be send
 function sendText(sender, text) {
 	let messageData = {text: text};
