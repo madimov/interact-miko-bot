@@ -1,28 +1,25 @@
 'use strict'
 
-// required modules
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
 const nodemailer = require('nodemailer'); 
 
-// create express app
+// Create express app.
 const app = express();
 
-// set app port
 app.set('port', (process.env.PORT || 5000));
 
-// set up bodyparser
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-// ROUTES
+// Set up routes.
 
 app.get('/', function(req, res) {
 	res.send("Hi I am a chatbot")
 });
 
-// Facebook
+// Set up webhook, to be used by Facebook Messenger.
 
 app.get('/webhook/', function(req, res) {
 	if (req.query['hub.verify_token'] === "interactmikobot") {
@@ -31,22 +28,24 @@ app.get('/webhook/', function(req, res) {
 	res.send("Wrong token");
 });
 
+// Handle messages.
 app.post('/webhook/', function(req, res) {
 	let messaging_events = req.body.entry[0].messaging;
-	
+	// Iterate through received messages.
 	for (let i = 0; i < messaging_events.length; i++) {
 		let event = messaging_events[i];
 		let sender = event.sender.id;
-
+		// If text message, decide on a response.
 		if (event.message && event.message.text) {
 			let text = event.message.text;
 			decideMessage(sender, text);
 		}
 	}
 	res.sendStatus(200);
+	// Request was successful.
 });
 
-// set up emailing capability
+// Set up emailing capability.
 let transporter = nodemailer.createTransport({
 	service: 'gmail',
 	auth: {
@@ -58,16 +57,17 @@ let transporter = nodemailer.createTransport({
 let mailOptions = {
 	from: 'interactmikobot@gmail.com',
 	to: 'miko-wan@hotmail.com',
-	subject: '',
-	text: ''
+	subject: '', // To be updated with user name.
+	text: ''     // To be updated with user data.
 };
 
-// initialize values
+// Initialize token, chatbot state, and user data.
 let token = "EAAJDvNLSAo8BAIRAZAYskNrgWoikPnAMhWVB0ZA8hvURXNCiQIzoY6EdTwag3lZA\
 uNZBXWGYnxq4x1EM5EgjtZBRPZBUhwYvwZCfFhGo1HZAtaITd91m1TfAq5JOAiBTQuUvC1dptgfJxa\
-9yuCtkjFflsLMwoCWjnCZAb7Kj5ai7V9wZDZD";
+9yuCtkjFflsLMwoCWjnCZAb7Kj5ai7V9wZDZD"; // for FB Messenger app authentication
 
-let idle = true;
+
+let idle = true; // Set chatbot state to idle, open to new messages.
 
 let personInfo = {
 	"first name":"",
@@ -79,32 +79,33 @@ let personInfo = {
 	"country":""
 };
 
-// choose message to send
+// Choose message to send.
 function decideMessage(sender, text1) {
 	let text = text1.toLowerCase();
-	console.log("idle: ", idle);
-	console.log("text: ", text);
 
 	if (idle) {
 		let introMessage = "Hi, I'd like to collect some basic information." + 
 		"\nWhat is your " + Object.keys(personInfo)[0] + "?";
+		// Introduce bot, ask for first piece of user data.
 		sendText(sender, introMessage);
-		idle = false;
-		return;
+		idle = false; // No longer idle; engaged in data collection.
+		return; // Break and wait for response.
 	} else if (existsEmptyKey()) {
-		console.log("existsEmptyKey");
+		// If engaged in data collection and there is missing data, get data.
 		fillNextEmptyKey(sender, text);
 		if (!existsEmptyKey()) {
+			// If no more data to collect, end conversation and clean up.
 			sendText(sender, "Thank you for the information. Goodbye!");
 			emailData();
-			clearInfo();
-			idle = true;
+			clearInfo(); // Make space for next user data.
+			idle = true; // Await a new conversation.
 		}
 	}
 }
 
 function existsEmptyKey() {
-	return ((typeof getNextEmptyKey() !== "undefined" && getNextEmptyKey() !== null));
+	return ((typeof getNextEmptyKey() !== "undefined" &&
+	 getNextEmptyKey() !== null));
 }
 
 function getNextEmptyKey() {
@@ -117,25 +118,24 @@ function getNextEmptyKey() {
 
 function fillNextEmptyKey(sender, text) {
 	let key = getNextEmptyKey();
-	console.log("getting next empty key: ", key);
 	getValue(sender, text, key);
 }
 
 function getValue(sender, text, key) {
 	if (isValid(text, key)) {
-		personInfo[key] = text;
-		console.log("personInfo['", key, "']", " has been set to ", text);
+		personInfo[key] = text; // Update user data with validated information.
 		if (existsEmptyKey()) {
+			// If more data to collect, ask for next missing piece of info.
 			let nextKey = getNextEmptyKey();
 			sendText(sender, getQuestion(nextKey, "valid"));
 		}
 	} else {
-		console.log(text, " is NOT a valid ", key, "... asking again for ", key, ".");
-		sendText(sender, getQuestion(key, "invalid"));
+		sendText(sender, getQuestion(key, "invalid")); // Repeat question.
 	}
 }
 
 function isValid(text, key) {
+	// validation criteria are somewhat loose due to range of valid responses.
 	if ((key === "first name") || (key === "last name")) {
 		return ((text.length < 85) && (/^[a-zA-Z]+$/.test(text)));
 	} else if (key === "email") {
@@ -153,10 +153,11 @@ function isValid(text, key) {
 
 function getQuestion(key, validity) {
 	let question = "";
-	if (validity === "invalid") {
+	if (validity === "invalid") { 
 		question = "I can't recognize this " + key + ". Please try again. ";
 	}
 	question += "What is your " + key + "?";
+	// Guide user to valid format.
 	if (key === "age") {
 		question += " Please use digits.";
 	} else if (key === "gender") {
@@ -167,10 +168,10 @@ function getQuestion(key, validity) {
 
 function emailData() {
 	mailOptions.subject = "Information about " + personInfo["first name"] + 
-	" " + personInfo["last name"];
-	mailOptions.text = JSON.stringify(personInfo);
+	" " + personInfo["last name"]; // Email subject is user name.
+	mailOptions.text = JSON.stringify(personInfo); // Email text is user data.
 
-	transporter.sendMail(mailOptions, function(error, info){
+	transporter.sendMail(mailOptions, function(error, info){ // Send email.
 		if (error) {
 			console.log(error);
 		} else {
@@ -185,13 +186,11 @@ function clearInfo() {
 	}
 }
 
-// set up text to be send
 function sendText(sender, text) {
 	let messageData = {text: text};
 	sendRequest(sender, messageData);
 }
 
-// send request
 function sendRequest(sender, messageData) {
 	request({
 		url: "https://graph.facebook.com/v2.6/me/messages",
@@ -210,7 +209,6 @@ function sendRequest(sender, messageData) {
 	});
 }
 
-// set up app listening
 app.listen(app.get('port'), function() {
 	console.log("running: port");
 })
