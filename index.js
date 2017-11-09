@@ -83,6 +83,10 @@ function decideMessage(sender, text1) {
 }
 
 // set up text to be send
+function sendText(sender, text) {
+	let messageData = {text: text};
+	sendRequest(sender, messageData);
+}
 
 // send request
 
