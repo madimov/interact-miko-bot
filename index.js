@@ -46,6 +46,10 @@ app.post('/webhook/', function(req, res) {
 });
 
 // initialize values
+let token = "EAAJDvNLSAo8BAIRAZAYskNrgWoikPnAMhWVB0ZA8hvURXNCiQIzoY6EdTwag3lZA\
+uNZBXWGYnxq4x1EM5EgjtZBRPZBUhwYvwZCfFhGo1HZAtaITd91m1TfAq5JOAiBTQuUvC1dptgfJxa\
+9yuCtkjFflsLMwoCWjnCZAb7Kj5ai7V9wZDZD";
+
 let idle = true;
 
 let personInfo = {
@@ -89,6 +93,23 @@ function sendText(sender, text) {
 }
 
 // send request
+function sendRequest(sender, messageData) {
+	request({
+		url: "https://graph.facebook.com/v2.6/me/messages",
+		qs: {access_token: token},
+		method: "POST",
+		json: {
+			recipient: {id: sender},
+			message : messageData
+		}
+	}, function(error, response, body) {
+		if (error) {
+			console.log("sending error");
+		} else if (response.body.error) {
+			console.log("response body error");
+		}
+	});
+}
 
 // set up app listening
 app.listen(app.get('port'), function() {
