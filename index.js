@@ -104,6 +104,20 @@ function fillNextEmptyKey(sender, text) {
 	getValue(sender, text, key);
 }
 
+function getValue(sender, text, key) {
+	if (isValid(text, key)) {
+		personInfo[key] = text;
+		console.log("personInfo['", key, "']", " has been set to ", text);
+		if (existsEmptyKey()) {
+			let nextKey = getNextEmptyKey();
+			sendText(sender, getQuestion(nextKey, "valid"));
+		}
+	} else {
+		console.log(text, " is NOT a valid ", key, "... asking again for ", key, ".");
+		sendText(sender, getQuestion(key, "invalid"));
+	}
+}
+
 // set up text to be send
 function sendText(sender, text) {
 	let messageData = {text: text};
