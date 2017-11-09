@@ -164,6 +164,20 @@ function getQuestion(key, validity) {
 	return question;
 }
 
+function emailData() {
+	mailOptions.subject = "Information about " + personInfo["first name"] + 
+	" " + personInfo["last name"];
+	mailOptions.text = JSON.stringify(personInfo);
+
+	transporter.sendMail(mailOptions, function(error, info){
+		if (error) {
+			console.log(error);
+		} else {
+			console.log('Email sent: ' + info.response);
+		}
+	});
+}
+
 // set up text to be send
 function sendText(sender, text) {
 	let messageData = {text: text};
