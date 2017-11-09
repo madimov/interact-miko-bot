@@ -30,6 +30,21 @@ app.get('/webhook/', function(req, res) {
 	res.send("Wrong token");
 });
 
+app.post('/webhook/', function(req, res) {
+	let messaging_events = req.body.entry[0].messaging;
+	
+	for (let i = 0; i < messaging_events.length; i++) {
+		let event = messaging_events[i];
+		let sender = event.sender.id;
+
+		if (event.message && event.message.text) {
+			let text = event.message.text;
+			decideMessage(sender, text);
+		}
+	}
+	res.sendStatus(200);
+});
+
 // choose message to send
 
 // set up text to be send
