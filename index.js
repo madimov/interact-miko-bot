@@ -86,6 +86,18 @@ function decideMessage(sender, text1) {
 	}
 }
 
+function existsEmptyKey() {
+	return ((typeof getNextEmptyKey() !== "undefined" && getNextEmptyKey() !== null));
+}
+
+function getNextEmptyKey() {
+	for (let key in personInfo) {
+		if (personInfo[key] === "") {
+			return key;
+		}
+	}
+}
+
 // set up text to be send
 function sendText(sender, text) {
 	let messageData = {text: text};
