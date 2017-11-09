@@ -45,7 +45,42 @@ app.post('/webhook/', function(req, res) {
 	res.sendStatus(200);
 });
 
+// initialize values
+let idle = true;
+
+let personInfo = {
+	"first name":"",
+	"last name":"",
+	"email":"",
+	"age":"",
+	"gender":"",
+	"city":"",
+	"country":""
+};
+
 // choose message to send
+function decideMessage(sender, text1) {
+	let text = text1.toLowerCase();
+	console.log("idle: ", idle);
+	console.log("text: ", text);
+
+	if (idle) {
+		let introMessage = "Hi, I'd like to collect some basic information." + 
+		"\nWhat is your " + Object.keys(personInfo)[0] + "?";
+		sendText(sender, introMessage);
+		idle = false;
+		return;
+	} else if (existsEmptyKey()) {
+		console.log("existsEmptyKey");
+		fillNextEmptyKey(sender, text);
+		if (!existsEmptyKey()) {
+			sendText(sender, "Thank you for the information. Goodbye!");
+			emailData();
+			clearInfo();
+			idle = true;
+		}
+	}
+}
 
 // set up text to be send
 
