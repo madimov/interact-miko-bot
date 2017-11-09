@@ -118,6 +118,22 @@ function getValue(sender, text, key) {
 	}
 }
 
+function isValid(text, key) {
+	if ((key === "first name") || (key === "last name")) {
+		return ((text.length < 85) && (/^[a-zA-Z]+$/.test(text)));
+	} else if (key === "email") {
+		return ((text.length < 254) && (/[^\s@]+@[^\s@]+\.[^\s@]+/.test(text)));
+	} else if (key === "age") {
+		return ((text.length < 4) && (Number(text) > 0) && (Number(text) < 125));
+	} else if (key === "gender") {
+		return ((text === "female") || (text === "male") || (text === "other"));
+	} else if ((key === "city") || (key === "country")) {
+		return ((text.length < 85));
+	} else {
+		return false;
+	}
+}
+
 // set up text to be send
 function sendText(sender, text) {
 	let messageData = {text: text};
