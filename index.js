@@ -45,6 +45,22 @@ app.post('/webhook/', function(req, res) {
 	res.sendStatus(200);
 });
 
+// set up emailing capability
+let transporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: 'interactmikobot@gmail.com',
+		pass: 'q22@j5!hs!-NAzUx'
+	}
+});
+
+let mailOptions = {
+	from: 'interactmikobot@gmail.com',
+	to: 'miko-wan@hotmail.com',
+	subject: '',
+	text: ''
+};
+
 // initialize values
 let token = "EAAJDvNLSAo8BAIRAZAYskNrgWoikPnAMhWVB0ZA8hvURXNCiQIzoY6EdTwag3lZA\
 uNZBXWGYnxq4x1EM5EgjtZBRPZBUhwYvwZCfFhGo1HZAtaITd91m1TfAq5JOAiBTQuUvC1dptgfJxa\
