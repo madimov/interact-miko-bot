@@ -134,6 +134,20 @@ function isValid(text, key) {
 	}
 }
 
+function getQuestion(key, validity) {
+	let question = "";
+	if (validity === "invalid") {
+		question = "I can't recognize this " + key + ". Please try again. ";
+	}
+	question += "What is your " + key + "?";
+	if (key === "age") {
+		question += " Please use digits.";
+	} else if (key === "gender") {
+		question += " Please use female/male/other.";
+	}
+	return question;
+}
+
 // set up text to be send
 function sendText(sender, text) {
 	let messageData = {text: text};
