@@ -4,6 +4,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
+const nodemailer = require('nodemailer'); 
 
 // create express app
 const app = express();
