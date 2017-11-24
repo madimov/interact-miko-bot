@@ -56,7 +56,7 @@ let transporter = nodemailer.createTransport({
 
 let mailOptions = {
 	from: 'interactmikobot@gmail.com',
-	to: 'michael@interact.io, patrick@interact.io',
+	to: 'miko-wan@hotmail.com',
 	subject: '', // To be updated with user name.
 	text: ''     // To be updated with user data.
 };
